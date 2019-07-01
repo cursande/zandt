@@ -1,0 +1,83 @@
+{
+  "about": "Here is the data you requested. Remember: Telegram is ad free, it doesn't use your data for ad targeting and doesn't sell it to others. Telegram only keeps the information it needs to function as a secure and feature-rich cloud service.\n\nCheck out Settings > Privacy & Security on Telegram's mobile apps for the relevant settings.",
+  "personal_information": {
+    "user_id": 99999999,
+    "first_name": "Bolger",
+    "last_name": "Studdz",
+    "phone_number": "+11 123 456 789",
+    "username": "@Wakkawakkawakka"
+  },
+  "profile_pictures": [],
+  "contacts": {
+    "about": "If you allow access, your contacts are continuously synced with Telegram. Thanks to this, you can easily switch to Telegram without losing your existing social graph – and connect with friends across all your devices. We use data about your contacts to let you know when they join Telegram. We also use it to make sure that you see the names you have in your phone book instead of the screen names people choose for themselves.\n\nYou can disable contact syncing or delete your stored contacts in Settings > Privacy & Security on Telegram's mobile apps.",
+    "list": [
+      {
+        "user_id": 0,
+        "first_name": "Falla",
+        "last_name": "F",
+        "phone_number": "2945542521337",
+        "date": "2019-04-29T23:49:33"
+      }
+    ]
+  },
+  "frequent_contacts": {
+    "about": "This rating shows which people you are likelier to message frequently. Telegram uses this data to populate the 'People' box at the top of the Search section. This rating is also calculated for inline bots so that the app can suggest the bots you are most likely to use in the attachment menu (or when you start a new message with \"@\").\n\nTo delete this data, go to Settings > Privacy & Security and disable 'Suggest Frequent Contacts' (requires Telegram for iOS v.4.8.3 or Telegram for Android v.4.8.10 or higher).",
+    "list": [
+      {
+        "id": 4444444444,
+        "category": "people",
+        "type": "user",
+        "name": "Falla",
+        "rating": 164.202148
+      }
+    ]
+  },
+  "chats": {
+    "about": "This page lists all chats from this export.",
+    "list": [
+      {
+        "name": "Falla",
+        "type": "personal_chat",
+        "id": 4444444444,
+        "messages": [
+          {
+            "id": 59107,
+            "type": "message",
+            "date": "2018-03-10T17:45:50",
+            "edited": "1970-01-01T10:00:00",
+            "from": "Falla F",
+            "from_id": 4444444444,
+            "text": "Hey ☺️  how's it going?"
+          },
+          {
+            "id": 59108,
+            "type": "message",
+            "date": "2018-03-10T17:45:54",
+            "edited": "1970-01-01T10:00:00",
+            "from": "Bolger",
+            "from_id": 99999999,
+            "text": "Good man how are you?"
+          },
+          {
+            "id": 59109,
+            "type": "message",
+            "date": "2018-03-10T17:46:22",
+            "edited": "1970-01-01T10:00:00",
+            "from": "Bolger",
+            "from_id": 99999999,
+            "text": "Life is pain 😱"
+          },
+          {
+            "id": 101233,
+            "type": "message",
+            "date": "2019-06-16T19:50:22",
+            "edited": "1970-01-01T10:00:00",
+            "from": "Falla F",
+            "from_id": 4444444444,
+            "text": "Yes. All hail Zuul"
+          }
+        ]
+      }
+    ]
+  }
+}
