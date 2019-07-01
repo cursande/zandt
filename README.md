@@ -1,10 +1,13 @@
-# zandt
+# Zandt
 
-FIXME: description
+A Clojure application for processing, analysing and presenting Telegram export data.
+
+For now it just processes it through SQLite until the schema/concept is a little
+more settled.
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Download from https://github.com/cursande/zandt
 
 ## Usage
 
@@ -24,13 +27,19 @@ FIXME: listing of options this app accepts.
 
 ...
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+### TODO:
+- Order and list most frequently used words
+- Order and list most frequently used emojis
+- Count messages and display proportion of total messages
+  belonging to a given user
+- Persist these values in a SQLite db:
+  - User table for the user ids
+  - Message table for each individual message
+  - Word table for every different kind of word
+  - Emoji table which we insert into when we come across emojis
+
 
 ## License
-
-Copyright © 2019 FIXME
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
