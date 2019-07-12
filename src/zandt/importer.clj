@@ -17,18 +17,13 @@
        (catch Exception e
          (println (.getMessage e)))))
 
-;; TODO: Add function that:
-;;   - Processes each chat in a list
-;;     - Inserts the user from the chat
-;;     - Scans through, collecting each unique word and how frequently it occurs
-;;       - Will check db if word exists,
-;;         IF it already exists
-;;           icrement the count of that word by its frequency in the message
-;;         ELSE
-;;           Insert the word with its frequency
-;;     - Scans through and inserts emojis found in messages
-;;       - Finds emojis with emoji matching regex e.g. "(<U\\+\\w+?>)"
+(defn message->message-data [message]
+  "Returns a map containing data to be inserted into the messages table"
+  {:telegram_id (:from_id message) :text (:text message)})
 
+;; TODO: Upsert/take current value of word
+;; UPDATE OR IGNORE ... (increment current value by frequency from message)
+;; INSERT OR IGNORE ... (add to default 0 the value by frequency from message)
 
 (defn -main [arg]
   (let [export-data (json-string->data-map arg)]

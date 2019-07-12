@@ -1,7 +1,6 @@
 (ns zandt.importer-test
   (:require [clojure.test :refer :all]
-            [zandt.importer :refer [message->message-data
-                                    message->word-and-frequency]]))
+            [zandt.importer :refer [message->message-data]]))
 
 ;; TODO: Should I be trying to test more 'pure' functions, and only doing side-effecting
 ;; actions with the return values of these tested functions? Or should I build smaller private
@@ -16,7 +15,7 @@
                         :from_id 12345
                         :text "Random message"}]
       (is (= (message->message-data test-message)
-             ({:telegram_id 12345 :text "Random message"})))))
+             {:telegram_id 12345 :text "Random message"}))))
 
 (deftest test-message->word-and-frequency
   (testing "It counts words, is case-insensitive and ignores emojis"
@@ -28,8 +27,7 @@
                         :from_id 12345
                         :text "And how and what. Why? ☺️ "}]
       (is (= (message->word-and-frequency test-message)
-             (#{{:word "and" :count 2}
+             #{{:word "and" :count 2}
                 {:word "how" :count 1}
                 {:word "what" :count 1}
-                {:word "why" :count 1}
-                }))))))
+                {:word "why" :count 1}})))))
