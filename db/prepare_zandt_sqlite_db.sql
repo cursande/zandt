@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS zandt.messages (
     id INTEGER PRIMARY KEY,
     telegram_id INTEGER,
     user_id INTEGER,
-    message TEXT NOT NULL,
+    text TEXT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
