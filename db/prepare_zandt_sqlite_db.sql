@@ -1,8 +1,7 @@
 CREATE TABLE IF NOT EXISTS zandt.users (
     id INTEGER PRIMARY KEY,
     telegram_id INTEGER NOT NULL UNIQUE,
-    first_name TEXT,
-    last_name TEXT
+    username TEXT
 );
 
 CREATE TABLE IF NOT EXISTS zandt.messages (
