@@ -1,5 +1,5 @@
 (ns zandt.importer
-  (:require [clojure.string :refer [trim-newline]]
+  (:require [clojure.string :refer [trim-newline lower-case]]
             [cheshire.core :refer [parse-string]]
             [clojure.java.jdbc :refer :all]))
 
@@ -18,12 +18,19 @@
          (println (.getMessage e)))))
 
 (defn message->message-data [message]
-  "Returns a map containing data to be inserted into the messages table"
+  "Returns a map containing user data"
   {:telegram_id (:from_id message) :text (:text message)})
 
-;; TODO: Upsert/take current value of word
-;; UPDATE OR IGNORE ... (increment current value by frequency from message)
-;; INSERT OR IGNORE ... (add to default 0 the value by frequency from message)
+(defn message->word-and-frequency [message]
+  "Returns a sequence of maps with each word (case insensitive), the external user id and the word count"
+  (let [words (re-seq #"\w+" (-> message
+                                 (get :text)
+                                 (lower-case)))
+        word-frequencies (frequencies words)]
+    (map (fn [[word count]] {:word word
+                             :telegram_id (:from_id message)
+                             :count count})
+         word-frequencies)))
 
 (defn -main [arg]
   (let [export-data (json-string->data-map arg)]
