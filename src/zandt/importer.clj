@@ -26,9 +26,10 @@
   (let [words (re-seq #"\w+" (-> message
                                  (get :text)
                                  (lower-case)))
-        word-frequencies (frequencies words)]
+        word-frequencies (frequencies words)
+        telegram_id (:from_id message)]
     (map (fn [[word count]] {:word word
-                             :telegram_id (:from_id message)
+                             :telegram_id telegram_id
                              :count count})
          word-frequencies)))
 
