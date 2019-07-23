@@ -40,3 +40,14 @@
 (def export-data (json-string->data-map "./test/fixtures/minimal_export_data.json"))
 
 (slurp "db/prepare_zandt_sqlite_db.sql")
+(defn message->emoji-and-frequency [message user-id]
+  "returns a sequence of maps with each emoji, the user id and the emoji count"
+  (let [emoji-matching-regex #"☺" ; TODO: Work out how to best match on and store emojis
+        emojis (re-seq emoji-matching-regex (get message :text))
+        emoji-frequencies (frequencies emojis)
+        telegram_id (:from_id message)]
+    (map (fn [[emoji count]] {:emoji emoji
+                              :user_id user-id
+                              :count count})
+         emoji-frequencies)))
+
