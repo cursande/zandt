@@ -7,6 +7,7 @@
                  [org.clojure/java.jdbc "0.7.8"]
                  [org.xerial/sqlite-jdbc "3.23.1"]
                  [cheshire "5.8.0"]]
+  :jvm-opts ["-Dfile.encoding=utf-8"]
   :main zandt.importer
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
