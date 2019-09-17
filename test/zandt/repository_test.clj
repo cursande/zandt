@@ -1,30 +1,23 @@
 (ns zandt.repository-test
   (:require [zandt.repository :refer [create-zandt-db
-                                      sqlite-db-spec
                                       update-or-insert!
                                       find-or-update-user!]]
+            [zandt.sqlite :refer [sqlite-db-spec
+                                  test-sqlite-db-spec
+                                  establish-sqlite-connection
+                                  close-sqlite-connection]]
             [clojure.java.io :refer [delete-file]]
             [clojure.java.jdbc :refer [query execute!]]
             [clojure.test :refer :all]))
-
-(def test-db "db/zandt-test.sqlite")
-
-(def test-sqlite-db-spec {:classname  "org.sqlite.JDBC"
-                          :subprotocol "sqlite"
-                          :subname test-db})
 
 (defn with-test-db [tests]
   (with-redefs
     [sqlite-db-spec test-sqlite-db-spec]
     sqlite-db-spec)
+  (establish-sqlite-connection)
   (create-zandt-db)
   (tests)
-  ;(delete-file "db/zandt-test.db")
-  )
-
-;; TODO: Need to make persistent connections to db until work is done
-;; https://grishaev.me/en/clj-sqlite/
-(execute! test-sqlite-db-spec (slurp "db/prepare_zandt_sqlite_db.sql"))
+  (close-sqlite-connection))
 
 (use-fixtures :once with-test-db)
 

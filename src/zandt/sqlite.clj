@@ -1,11 +1,18 @@
 (ns zandt.sqlite
   (:require [clojure.java.jdbc :refer [get-connection]]
-            [mount.core :refer [defstate start]]))
+            [mount.core :refer [defstate
+                                start
+                                stop]]))
 
 (def sqlite-db-spec
   {:classname   "org.sqlite.JDBC"
    :subprotocol "sqlite"
    :subname     "db/zandt.sqlite"})
+
+(def test-sqlite-db-spec
+  {:classname  "org.sqlite.JDBC"
+   :subprotocol "sqlite"
+   :subname "db/zandt-test.sqlite"})
 
 ;; Track in-memory db connection, as by default sqlite will create a
 ;; new connection, execute a command and then close the connection, resulting
@@ -33,5 +40,9 @@
   :stop (on-stop))
 
 (defn establish-sqlite-connection []
-  "Will return a map with `connection-uri` and `connection` Java object"
+  "Will return a map with `connection-uri` string and `connection` Java object"
   start #'db)
+
+(defn close-sqlite-connection []
+  "Will close the connection created with 'establish-sqlite-connection'"
+  stop #'db)

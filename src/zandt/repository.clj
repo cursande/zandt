@@ -1,15 +1,12 @@
 (ns zandt.repository
-  (:require [clojure.java.jdbc :refer :all]))
+  (:require [clojure.java.jdbc :refer :all]
+            [zandt.sqlite :refer [sqlite-db-spec
+                                  establish-sqlite-connection]]))
 
-(def zandt-sqlite-path "db/prepare_zandt_sqlite_db.sql")
-
-(def sqlite-db-spec
-  {:classname   "org.sqlite.JDBC"
-   :subprotocol "sqlite"
-   :subname     "db/zandt.sqlite"})
+(def zandt-db-path "db/prepare_zandt_sqlite_db.sql")
 
 (defn create-zandt-db []
-  (try (execute! sqlite-db-spec (slurp zandt-sqlite-path))
+  (try (execute! sqlite-db-spec (slurp zandt-db-path))
        (catch Exception e
          (println (.getMessage e)))))
 
