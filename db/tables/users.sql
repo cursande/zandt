@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    telegram_id INTEGER NOT NULL UNIQUE,
+    username TEXT
+);
