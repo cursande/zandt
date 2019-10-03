@@ -1,10 +1,10 @@
-CREATE TABLE IF NOT EXISTS zandt.users (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY,
     telegram_id INTEGER NOT NULL UNIQUE,
     username TEXT
 );
 
-CREATE TABLE IF NOT EXISTS zandt.messages (
+CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY,
     telegram_id INTEGER,
     user_id INTEGER,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS zandt.messages (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS zandt.words (
+CREATE TABLE IF NOT EXISTS words (
     id INTEGER PRIMARY KEY,
     user_id INTEGER,
     frequency INTEGER DEFAULT 0,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS zandt.words (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS zandt.emojis (
+CREATE TABLE IF NOT EXISTS emojis (
     id INTEGER PRIMARY KEY,
     user_id INTEGER,
     frequency INTEGER DEFAULT 0,
