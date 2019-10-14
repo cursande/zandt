@@ -29,8 +29,7 @@
     (update-or-insert! db
                        :users
                        user-data
-                       (format "WHERE telegram_id = %s"
-                               telegram-id))))
+                       ["telegram_id = ?" telegram-id])))
 
 ;; (defn find-or-update-message! [message user-id]
 ;;   "Returns the primary key for the found or created message"
