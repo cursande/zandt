@@ -1,14 +1,18 @@
 (ns zandt.repository
   (:require [clojure.java.jdbc :refer :all]
-            [zandt.sqlite :refer [sqlite-db-spec db]]))
+            [zandt.sqlite :refer [db]]))
 
-(def zandt-db-script "db/prepare_zandt_sqlite_db.sql")
+(def zandt-db-scripts ["db/tables/users.sql"
+                       "db/tables/messages.sql"
+                       "db/tables/words.sql"
+                       "db/tables/emojis.sql"])
 
 (defn create-zandt-db []
-  (try (execute! db (slurp zandt-db-script))
-       (catch Exception e
-         (println (.getMessage e))
-         (throw e))))
+  (doseq [script zandt-db-scripts]
+    (try (execute! db (slurp script))
+         (prn (str script " successfully executed"))
+         (catch Exception e
+           (prn (.getMessage e))))))
 
 (defn update-or-insert!
   "Updates columns or inserts a new row in the specified table"
