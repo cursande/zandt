@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS emojis (
     id INTEGER PRIMARY KEY,
+    message_id INTEGER,
     user_id INTEGER,
     frequency INTEGER DEFAULT 0,
     emoji TEXT NOT NULL,
