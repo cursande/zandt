@@ -23,13 +23,19 @@
         (insert! t-con table row)
         result))))
 
+(defn primary-id [result]
+  (if (map? (first result)) ; update will return a map if new record
+    (-> result first vals first)
+    (-> result first)))
+
 (defn find-or-update-user! [user-data]
   "Returns the primary key for the found or created user"
-  (let [telegram-id (get user-data :telegram_id)]
-    (update-or-insert! db
-                       :users
-                       user-data
-                       ["telegram_id = ?" telegram-id])))
+  (let [telegram-id (get user-data :telegram_id)
+        user        (update-or-insert! db
+                                       :users
+                                       user-data
+                                       ["telegram_id = ?" telegram-id])]
+    (primary-id user)))
 
 ;; (defn find-or-update-message! [message user-id]
 ;;   "Returns the primary key for the found or created message"
