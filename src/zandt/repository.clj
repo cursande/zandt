@@ -37,17 +37,23 @@
                                        ["telegram_id = ?" telegram-id])]
     (primary-id user)))
 
-;; (defn find-or-update-message! [message user-id]
-;;   "Returns the primary key for the found or created message"
+(defn find-or-update-message! [message-data user-id]
+  "Returns the primary key for the found or created message"
+  (let [telegram-id (get message-data :telegram_id)
+        message     (update-or-insert! db
+                                       :messages
+                                       message-data
+                                       ["telegram_id = ?" telegram-id])]
+    (primary-id message)))
 
-;;   )
-
-;; (defn find-or-update-word! []
+;; (defn create-or-increment-word! [word-data]
 ;;   "Will find the word by `word` and `user-id`, increment if found"
+;;   (let [word (update-or-insert! db
+;;                                 :words
+;;                                 message-data
+;;                                 ["telegram_id = ?" telegram-id])]))
 
-;;   )
-
-;; (defn find-or-update-emoji! []
+;; (defn create-or-increment-emoji! []
 ;;   "Will find the word by `emoji` and `user-id`, increment if found"
 
 ;;   )
