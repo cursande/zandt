@@ -12,7 +12,7 @@
    :user_id user-id
    :text (:text message)})
 
-(defn message->words-and-frequencies [message user-id]
+(defn message->words-and-frequencies [message message-id user-id]
   "returns a sequence of maps with each word (case insensitive), the user id and the word count"
   (let [words (re-seq #"\w+" (-> message
                                  (get :text)
@@ -20,11 +20,12 @@
         word-frequencies (frequencies words)
         telegram_id (:from_id message)]
     (map (fn [[word count]] {:word word
+                             :message_id message-id
                              :user_id user-id
-                             :count count})
+                             :frequency count})
          word-frequencies)))
 
-(defn message->emojis-and-frequencies [message user-id]
+(defn message->emojis-and-frequencies [message message-id user-id]
   "returns a sequence of maps with each emoji, the user id and the emoji count"
   (let [emoji-matching-regex (re-pattern (str "\u00a9|"
                                               "\u00ae|"
@@ -36,6 +37,7 @@
         emoji-frequencies (frequencies emojis)
         telegram_id (:from_id message)]
     (map (fn [[emoji count]] {:emoji emoji
+                              :message_id message-id
                               :user_id user-id
-                              :count count})
+                              :frequency count})
          emoji-frequencies)))
