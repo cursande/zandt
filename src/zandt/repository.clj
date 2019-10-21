@@ -23,37 +23,63 @@
         (insert! t-con table row)
         result))))
 
+(defn update-or-initialize-frequency!
+  "Finds and increments record frequency, or initialises new record with frequency"
+  [db table row where-clause]
+  (let [[column-parameters & values] where-clause
+        select-statement (vec (concat [(str "SELECT frequency FROM " (name table) " WHERE " column-parameters)] values))
+        result (query db
+                      select-statement
+                      {:result-set-fn first})
+        new-frequency (+ (get result :frequency 0)
+                         (get row :frequency))]
+    (if (seq result)
+      (update! db table (assoc result :frequency new-frequency) where-clause)
+      (insert! db table row))))
+
 (defn primary-id [result]
-  (if (map? (first result)) ; update will return a map if new record
+  (if (map? (first result)) ; update will return a map if found record
     (-> result first vals first)
     (-> result first)))
 
 (defn create-or-update-user! [user-data]
   "Returns the primary key for the found or created user"
   (let [telegram-id (get user-data :telegram_id)
-        user        (update-or-insert! db
-                                       :users
-                                       user-data
-                                       ["telegram_id = ?" telegram-id])]
+        user        (update-or-insert!
+                     db
+                     :users
+                     user-data
+                     ["telegram_id = ?" telegram-id])]
     (primary-id user)))
 
 (defn create-or-update-message! [message-data user-id]
   "Returns the primary key for the found or created message"
   (let [telegram-id (get message-data :telegram_id)
-        message     (update-or-insert! db
-                                       :messages
-                                       message-data
-                                       ["telegram_id = ?" telegram-id])]
+        message     (update-or-insert!
+                     db
+                     :messages
+                     message-data
+                     ["telegram_id = ?" telegram-id])]
     (primary-id message)))
 
-;; (defn initialize-or-increment-word! [word-data]
-;;   "Will find the word by `word` and `user-id`, increment if found"
-;;   (let [word (update-or-insert! db
-;;                                 :words
-;;                                 message-data
-;;                                 ["telegram_id = ?" telegram-id])]))
+(defn update-or-initialize-word-frequency! [word-data message-id user-id]
+  "Will search for word by `word` and `user-id`.
+   If found: adds new `frequency` to the existing value.
+   If not found: adds new record, setting `frequency` with passed in `frequency`."
+  (let [word (update-or-initialize-frequency!
+              db
+              :words
+              word-data
+              ["word = ? AND user_id = ?" (get word-data :word) user-id])]
+    (primary-id word)))
 
-;; (defn initialize-or-increment-emoji! []
-;;   "Will find the word by `emoji` and `user-id`, increment if found"
-
-;;   )
+(defn update-or-initialize-emoji-frequency! [emoji-data message-id user-id]
+  "Will find the word by `emoji` and `user-id`.
+   If found: adds new `frequency` to the existing value.
+   If not found: adds new record, setting `frequency` with passed in `frequency`."
+  (let [emoji (update-or-initialize-frequency!
+              db
+              :emojis
+              emoji-data
+              ["emoji = ? AND user_id = ?" (get emoji-data :emoji) user-id])]
+    (primary-id emoji)))
