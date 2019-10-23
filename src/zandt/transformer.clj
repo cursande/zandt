@@ -1,10 +1,10 @@
 (ns zandt.transformer
   (:require [clojure.string :refer [lower-case]]))
 
-(defn chat->user-data [message]
-  "Returns a map containing user data"
-  {:telegram_id (:id message)
-   :username (:name message)})
+(defn message->user-data [message]
+  "Returns a map containing user data extracted from the message"
+  {:telegram_id (:from_id message)
+   :username (:from message)})
 
 (defn message->message-data [message user-id]
   "Returns a map containing message data"
