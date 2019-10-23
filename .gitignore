@@ -10,4 +10,8 @@ pom.xml.asc
 .hgignore
 .hg/
 
+# Any db files
 /db/*.sqlite
+
+# linter files
+.clj-kondo
