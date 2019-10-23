@@ -13,10 +13,11 @@
    :text (:text message)})
 
 (defn message->words-and-frequencies [message message-id user-id]
-  "returns a sequence of maps with each word (case insensitive), the user id and the word count"
-  (let [words (re-seq #"\w+" (-> message
-                                 (get :text)
-                                 (lower-case)))
+  "returns a sequence of maps with each word (case insensitive and can include dashes or apostrophes),
+   the user id and the word count."
+  (let [words (re-seq #"\b[a-z]+(?:['-]?[a-z]+)*\b" (-> message
+                                                        (get :text)
+                                                        (lower-case)))
         word-frequencies (frequencies words)
         telegram_id (:from_id message)]
     (map (fn [[word count]] {:word word

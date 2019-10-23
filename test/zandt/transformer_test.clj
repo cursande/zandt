@@ -43,6 +43,25 @@
                {:word "why"
                 :message_id 1234
                 :user_id 999
+                :frequency 1})))))
+  (testing "It counts words with apostrophes in them as a distinct word"
+    (let [message {:id 99999
+                   :type "message"
+                   :date "2018-03-10T17:45:50"
+                   :edited "1970-01-01T10:00:00"
+                   :from "Some one"
+                   :from_id 12345
+                   :text "How's that?"}
+          user-id 999
+          message-id 1234]
+      (is (= (message->words-and-frequencies message message-id user-id)
+             '({:word "how's"
+                :message_id 1234
+                :user_id 999
+                :frequency 1}
+               {:word "that"
+                :message_id 1234
+                :user_id 999
                 :frequency 1}))))))
 
 (deftest test-message->emojis-and-frequencies
