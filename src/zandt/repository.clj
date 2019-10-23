@@ -1,6 +1,6 @@
 (ns zandt.repository
   (:require [clojure.java.jdbc :refer :all]
-            [zandt.sqlite :refer [db]]))
+            [zandt.sqlite :refer :all]))
 
 (def zandt-db-scripts ["db/tables/users.sql"
                        "db/tables/messages.sql"
@@ -17,12 +17,15 @@
 (defn update-or-insert!
   "Updates columns or inserts a new row in the specified table"
   [db table row where-clause]
+  ;; TODO: Error handling here could be much better, if there is no active connection
+  ;; to the db, you get back pretty indirect information
   (with-db-transaction [t-con db]
     (let [result (update! t-con table row where-clause)]
       (if (zero? (first result))
         (insert! t-con table row)
         result))))
 
+;; TODO: Why did I not just leave it to the db to process the frequency of values in a column...yuck
 (defn update-or-initialize-frequency!
   "Finds and increments record frequency, or initialises new record with frequency"
   [db table row where-clause]
@@ -52,7 +55,7 @@
                      ["telegram_id = ?" telegram-id])]
     (primary-id user)))
 
-(defn create-or-update-message! [message-data user-id]
+(defn create-or-update-message! [message-data]
   "Returns the primary key for the found or created message"
   (let [telegram-id (get message-data :telegram_id)
         message     (update-or-insert!
@@ -62,7 +65,7 @@
                      ["telegram_id = ?" telegram-id])]
     (primary-id message)))
 
-(defn update-or-initialize-word-frequency! [word-data message-id user-id]
+(defn update-or-initialize-word-frequency! [word-data]
   "Will search for word by `word` and `user-id`.
    If found: adds new `frequency` to the existing value.
    If not found: adds new record, setting `frequency` with passed in `frequency`."
@@ -70,10 +73,10 @@
               db
               :words
               word-data
-              ["word = ? AND user_id = ?" (get word-data :word) user-id])]
+              ["word = ? AND user_id = ?" (get word-data :word) (get word-data :user_id)])]
     (primary-id word)))
 
-(defn update-or-initialize-emoji-frequency! [emoji-data message-id user-id]
+(defn update-or-initialize-emoji-frequency! [emoji-data]
   "Will find the word by `emoji` and `user-id`.
    If found: adds new `frequency` to the existing value.
    If not found: adds new record, setting `frequency` with passed in `frequency`."
@@ -81,5 +84,5 @@
               db
               :emojis
               emoji-data
-              ["emoji = ? AND user_id = ?" (get emoji-data :emoji) user-id])]
+              ["emoji = ? AND user_id = ?" (get emoji-data :emoji) (get emoji-data :user_id)])]
     (primary-id emoji)))

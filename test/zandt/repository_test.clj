@@ -1,23 +1,9 @@
 (ns zandt.repository-test
   (:require [zandt.repository :refer :all]
-            [zandt.sqlite :refer [db
-                                  sqlite-db-spec
-                                  test-sqlite-db-spec
-                                  establish-sqlite-connection
-                                  close-sqlite-connection]]
+            [zandt.sqlite :refer [db]]
+            [zandt.test-utils :refer [with-test-db]]
             [clojure.java.jdbc :refer [query]]
             [clojure.test :refer :all]))
-
-;; TODO: Drag out the stuff below into a general test utils namespace, so I can spin
-;; up a db connection for integration tests as well
-(defn with-test-db [tests]
-  (with-redefs [sqlite-db-spec test-sqlite-db-spec])
-  (prn "### Setting up test sqlite db ###")
-  (establish-sqlite-connection)
-  (create-zandt-db)
-  (tests)
-  (prn "### tearing down sqlite db ###")
-  (close-sqlite-connection))
 
 (use-fixtures :once with-test-db)
 
@@ -37,7 +23,7 @@
   "It creates or updates the message, and returns the primary key"
 (let [user-id (create-or-update-user! {:username "Falla" :telegram_id 8888888888})
       message-data {:user_id user-id :telegram_id  8888888888 :text "Hello Friends"}]
-    (create-or-update-message! message-data user-id)
+    (create-or-update-message! message-data)
     (is (= (query db
                   ["SELECT user_id, telegram_id, text FROM messages WHERE telegram_id = ?" (get message-data :telegram_id)]
                   {:result-set-fn first})
@@ -46,10 +32,10 @@
 (deftest test-update-or-initialize-word-frequency!
   (testing "If the record did not exist, it creates it and initialises frequency"
     (let [user-id (create-or-update-user! {:username "Falla"  :telegram_id 8888888888})
-          message-id (create-or-update-message! {:user_id user-id :telegram_id  8888888888, :text "bloob"} user-id)
+          message-id (create-or-update-message! {:user_id user-id :telegram_id  8888888888, :text "bloob"})
           word-data {:user_id user-id :message_id message-id :word "bloob" :frequency 5}]
 
-      (update-or-initialize-word-frequency! word-data message-id user-id)
+      (update-or-initialize-word-frequency! word-data)
 
       (is (= (query db
                     ["SELECT word, user_id, message_id, frequency FROM words WHERE word = ?" (get word-data :word)]
@@ -59,7 +45,7 @@
       (testing "If the record already exists, update the existing frequency"
         (let [repeat-word-data {:user_id user-id :message_id message-id :word "bloob" :frequency 3}]
 
-          (update-or-initialize-word-frequency! repeat-word-data message-id user-id)
+          (update-or-initialize-word-frequency! repeat-word-data)
 
           (is (= (query db
                         ["SELECT word, user_id, message_id, frequency FROM words WHERE word = ?" (get word-data :word)]
@@ -69,10 +55,10 @@
 (deftest test-update-or-initialize-emoji-frequency!
   (testing "If the record did not exist, it creates it and initialises frequency"
     (let [user-id (create-or-update-user! {:username "Falla"  :telegram_id 8888888888})
-          message-id (create-or-update-message! {:user_id user-id :telegram_id  8888888888, :text "bloob"} user-id)
+          message-id (create-or-update-message! {:user_id user-id :telegram_id  8888888888, :text "bloob"})
           emoji-data {:user_id user-id :message_id message-id :emoji "☺" :frequency 2}]
 
-      (update-or-initialize-emoji-frequency! emoji-data message-id user-id)
+      (update-or-initialize-emoji-frequency! emoji-data)
 
       (is (= (query db
                     ["SELECT emoji, user_id, message_id, frequency FROM emojis WHERE emoji = ?" (get emoji-data :emoji)]
@@ -82,7 +68,7 @@
       (testing "If the record already exists, update the existing frequency"
         (let [repeat-emoji-data {:user_id user-id :message_id message-id :emoji "☺" :frequency 1}]
 
-          (update-or-initialize-emoji-frequency! repeat-emoji-data message-id user-id)
+          (update-or-initialize-emoji-frequency! repeat-emoji-data)
 
           (is (= (query db
                         ["SELECT emoji, user_id, message_id, frequency FROM emojis WHERE emoji = ?" (get emoji-data :emoji)]
