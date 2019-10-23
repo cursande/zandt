@@ -1,74 +1,58 @@
 (ns zandt.importer-test
   (:require [clojure.test :refer :all]
-            [zandt.importer :refer [message->message-data
-                                    message->word-and-frequency
-                                    message->emoji-and-frequency]]))
+            [zandt.transformer :refer [message->user-data]]
+            [zandt.repository :refer [create-or-update-user!]]
+            [clojure.java.jdbc :refer [query]]
+            [zandt.sqlite :refer [db]]
+            [zandt.test-utils :refer [with-test-db]]
+            [zandt.importer :refer [import-chats
+                                    json-string->data-map
+                                    find-user-id-from-users-map]]))
 
-;; TODO: Should I be trying to test more 'pure' functions, and only doing side-effecting
-;; actions with the return values of these tested functions? Or should I build smaller private
-;; namespace functions that I trust, and then either mock the db or build a test-connection to
-;; test the main interface?
-(deftest test-message->message-data
+(use-fixtures :once with-test-db)
+
+(deftest test-find-user-id-from-users-map
+  (testing "Where the user's id has not already been stored in the map, it creates the user
+            and stores them in the map"
     (let [message {:id 99999
-                        :type "message"
-                        :date "2018-03-10T17:45:50"
-                        :edited "1970-01-01T10:00:00"
-                        :from "Some one"
-                        :from_id 12345
+                   :type "message"
+                   :date "2018-03-10T17:45:50"
+                   :edited "1970-01-01T10:00:00"
+                   :from "Some one"
+                   :from_id 12345
                    :text "Random message"}
-          user-id 999]
-      (is (= (message->message-data message user-id)
-             {:telegram_id 99999
-              :user_id 999
-              :text "Random message"}))))
+          user-map (atom {})]
+      (find-user-id-from-users-map message user-map)
+      (is (= (keys @user-map)
+             (list (:from_id message))))))
+  (testing "Where the user already exists, it simply pulls the primary key from the user-map"
+    (let [message  {:id 99999
+                    :type "message"
+                    :date "2018-03-10T17:45:50"
+                    :edited "1970-01-01T10:00:00"
+                    :from "Some one"
+                    :from_id 12345
+                    :text "Random message"}
+          user-id  (create-or-update-user! (message->user-data message))
+          user-map (atom {(:from_id message) user-id})]
+      (is (= (find-user-id-from-users-map message user-map)
+             user-id)))))
 
-(deftest test-message->word-and-frequency
-  (testing "It counts words, is case-insensitive and ignores emojis and punctuation"
-    (let [message {:id 99999
-                        :type "message"
-                        :date "2018-03-10T17:45:50"
-                        :edited "1970-01-01T10:00:00"
-                        :from "Some one"
-                        :from_id 12345
-                        :text "And how and what. Why? ☺"}
-          user-id 999]
-      (is (= (message->word-and-frequency message user-id)
-             '({
-                :word "and"
-                :user_id 999
-                :count 2
-                }
-               {
-                :word "how"
-                :user_id 999
-                :count 1
-                }
-               {
-                :word "what"
-                :user_id 999
-                :count 1
-                }
-               {
-                :word "why"
-                :user_id 999
-                :count 1
-                }))))))
+(deftest test-import-chats
+  (testing "it imports chat data into a data store"
+    (let [data-map (json-string->data-map "test/fixtures/minimal_export_data.json")]
+      (import-chats data-map)
 
-(deftest test-message->emoji-and-frequency
-  (testing "It counts emojis, ignores all other words or characters"
-    (let [message {:id 99999
-                        :type "message"
-                        :date "2018-03-10T17:45:50"
-                        :edited "1970-01-01T10:00:00"
-                        :from "Some one"
-                        :from_id 12345
-                        :text "And how and what. Why? ☺"}
-          user-id 999]
-      ;; TODO: Unicode hell: I *think* the problem is where emoji are encoded as two
-      ;; or more characters (surrogate pairs). Looks like
-      ;; Clojure shouldn't have an issue though so I'm confused.
-      ;; https://lambdaisland.com/blog/2017-06-12-clojure-gotchas-surrogate-pairs
-      ;; https://building.buildkite.com/updating-buildkite-for-emoji-4-0-e1c5d4b4583d
-      ;; For time being, will just manually enter new emojis into regex-matcher
-      (is (= (message->emoji-and-frequency message user-id)
-             '({:emoji "☺" :user_id 999 :count 1}))))))
+      (is (= (query db ["SELECT COUNT(*) FROM messages"] {:result-set-fn first})
+             {(keyword "count(*)") 4}))
+
+      (is (= (set (query db ["SELECT username FROM users"]))
+             #{{:username "Falla F"} {:username "Bolger"}}))
+
+      (is (= (query db ["SELECT frequency, word FROM words WHERE user_id = 1 ORDER BY frequency DESC LIMIT 3"])
+             [{:frequency 2, :word "hey"}
+              {:frequency 2, :word "it"}
+              {:frequency 1, :word "how's"}]))
+
+      (is (= (query db ["SELECT frequency, emoji FROM emojis WHERE user_id = 1 ORDER BY frequency"])
+             [{:frequency 2 :emoji "☺"}])))))
