@@ -14,10 +14,6 @@
    :subprotocol "sqlite"
    :subname "db/zandt-test.sqlite"})
 
-;; Track in-memory db connection, as by default sqlite will create a
-;; new connection, execute a command and then close the connection, resulting
-;; in the data being completely cleared from RAM.
-;; https://grishaev.me/en/clj-sqlite/
 (def db-uri "jdbc:sqlite::memory:")
 
 (declare db)
@@ -44,5 +40,5 @@
   (start #'db))
 
 (defn close-sqlite-connection []
-  "Will close the connection created with 'establish-sqlite-connection'"
+  "Will close the connection created with `establish-sqlite-connection`"
   (stop #'db))
