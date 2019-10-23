@@ -19,11 +19,20 @@
         (do (swap! users-map assoc from-id user-id)
             user-id)))))
 
+(defn message-is-not-text? [message]
+  "Checks the message and ensures it doesn't contain a link, sticker etc. Non-text messages
+   will contain at least one vector containing a map with a `:type` key."
+  (let [text (:text message)]
+    (or (coll? text)
+        (contains? text :type))))
+
 (defn import-messages [chat]
   "Munges and inserts data from each chat"
   (let [messages  (:messages chat)
         users-map (atom {})]
     (doseq [message messages]
+      (if message-is-not-text? message)
+      nil
       (let [user-id    (find-user-id-from-users-map message users-map)
             message-id (create-or-update-message! (message->message-data message user-id))
             words      (message->words-and-frequencies message message-id user-id)
