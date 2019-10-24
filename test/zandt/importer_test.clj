@@ -54,5 +54,5 @@
               {:frequency 2, :word "it"}
               {:frequency 1, :word "how's"}]))
 
-      (is (= (query db ["SELECT frequency, emoji FROM emojis WHERE user_id = 1 ORDER BY frequency"])
+      (is (= (query db ["SELECT frequency, emoji FROM emojis WHERE user_id = 1 ORDER BY frequency DESC"])
              [{:frequency 2 :emoji "☺"}])))))

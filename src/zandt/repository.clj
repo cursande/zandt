@@ -25,7 +25,9 @@
         (insert! t-con table row)
         result))))
 
-;; TODO: Why did I not just leave it to the db to process the frequency of values in a column...yuck
+;; TODO: It's a bit yuck...in an effort to not have a ridiculous number of rows for words in particular, I instead
+;; store every word once per user and update its frequency. The problem is how can I safely parallelise this or speed
+;; it up??
 (defn update-or-initialize-frequency!
   "Finds and increments record frequency, or initialises new record with frequency"
   [db table row where-clause]

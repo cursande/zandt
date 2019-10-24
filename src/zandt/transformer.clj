@@ -28,7 +28,8 @@
 
 (defn message->emojis-and-frequencies [message message-id user-id]
   "returns a sequence of maps with each emoji, the user id and the emoji count"
-  (let [emoji-matching-regex (re-pattern (str "\u00a9|"
+  (let [emoji-matching-regex (re-pattern (str "^`"
+                                              "\u00a9|"
                                               "\u00ae|"
                                               "[\u2000-\u3300]|"
                                               "\ud83c[\ud000-\udfff]|"
