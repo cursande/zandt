@@ -19,19 +19,25 @@
         (do (swap! users-map assoc from-id user-id)
             user-id)))))
 
+(defn no-user-id? [message] (nil? (:from_id message)))
+
 (defn message-is-not-text? [message]
   "Checks the message and ensures it doesn't contain a link, sticker etc. Non-text messages
-   will contain at least one vector containing a map with a `:type` key."
+   seem to contain at least one vector, with a map containing a `:type` key."
   (let [text (:text message)]
-    (or (coll? text)
-        (contains? text :type))))
+    (or (not (= (:type message) "message"))
+        (coll? text))))
+
+(defn message-cannot-be-stored? [message]
+  (or (no-user-id? message)
+      (message-is-not-text? message)))
 
 (defn import-messages [chat]
   "Munges and inserts data from each chat"
   (let [messages  (:messages chat)
         users-map (atom {})]
     (doseq [message messages]
-      (if message-is-not-text? message)
+      (if (message-cannot-be-stored? message)
       nil
       (let [user-id    (find-user-id-from-users-map message users-map)
             message-id (create-or-update-message! (message->message-data message user-id))
@@ -40,7 +46,7 @@
         (doseq [word words]
           (update-or-initialize-word-frequency! word))
         (doseq [emoji emojis]
-          (update-or-initialize-emoji-frequency! emoji))))))
+          (update-or-initialize-emoji-frequency! emoji)))))))
 
 (defn import-chats [data-map]
   "Munges and inserts data into persistent data store"
