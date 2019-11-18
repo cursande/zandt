@@ -35,10 +35,12 @@
   :start (on-start)
   :stop (on-stop))
 
-(defn establish-sqlite-connection []
+(defn establish-sqlite-connection
   "Will return a map with `connection-uri` string and `connection` Java object"
+  []
   (start #'db))
 
-(defn close-sqlite-connection []
+(defn close-sqlite-connection
   "Will close the connection created with `establish-sqlite-connection`"
+  []
   (stop #'db))

@@ -32,45 +32,43 @@
 (deftest test-update-or-initialize-word-frequency!
   (testing "If the record did not exist, it creates it and initialises frequency"
     (let [user-id (create-or-update-user! {:username "Falla"  :telegram_id 8888888888})
-          message-id (create-or-update-message! {:user_id user-id :telegram_id  8888888888, :text "bloob"})
-          word-data {:user_id user-id :message_id message-id :word "bloob" :frequency 5}]
+          word-data {:user_id user-id :word "bloob" :frequency 5}]
 
       (update-or-initialize-word-frequency! word-data)
 
       (is (= (query db
-                    ["SELECT word, user_id, message_id, frequency FROM words WHERE word = ?" (get word-data :word)]
+                    ["SELECT word, user_id, frequency FROM words WHERE word = ?" (get word-data :word)]
                     {:result-set-fn first})
-             {:word "bloob" :user_id user-id :message_id message-id :frequency 5}))
+             {:word "bloob" :user_id user-id :frequency 5}))
 
       (testing "If the record already exists, update the existing frequency"
-        (let [repeat-word-data {:user_id user-id :message_id message-id :word "bloob" :frequency 3}]
+        (let [repeat-word-data {:user_id user-id :word "bloob" :frequency 3}]
 
           (update-or-initialize-word-frequency! repeat-word-data)
 
           (is (= (query db
-                        ["SELECT word, user_id, message_id, frequency FROM words WHERE word = ?" (get word-data :word)]
+                        ["SELECT word, user_id, frequency FROM words WHERE word = ?" (get word-data :word)]
                         {:result-set-fn first})
-                 {:word "bloob" :user_id user-id :message_id message-id :frequency 8})))))))
+                 {:word "bloob" :user_id user-id :frequency 8})))))))
 
 (deftest test-update-or-initialize-emoji-frequency!
   (testing "If the record did not exist, it creates it and initialises frequency"
     (let [user-id (create-or-update-user! {:username "Falla"  :telegram_id 8888888888})
-          message-id (create-or-update-message! {:user_id user-id :telegram_id  8888888888, :text "bloob"})
-          emoji-data {:user_id user-id :message_id message-id :emoji "☺" :frequency 2}]
+          emoji-data {:user_id user-id :emoji "☺" :frequency 2}]
 
       (update-or-initialize-emoji-frequency! emoji-data)
 
       (is (= (query db
-                    ["SELECT emoji, user_id, message_id, frequency FROM emojis WHERE emoji = ?" (get emoji-data :emoji)]
+                    ["SELECT emoji, user_id, frequency FROM emojis WHERE emoji = ?" (get emoji-data :emoji)]
                     {:result-set-fn first})
-             {:emoji "☺" :user_id user-id :message_id message-id :frequency 2}))
+             {:emoji "☺" :user_id user-id :frequency 2}))
 
       (testing "If the record already exists, update the existing frequency"
-        (let [repeat-emoji-data {:user_id user-id :message_id message-id :emoji "☺" :frequency 1}]
+        (let [repeat-emoji-data {:user_id user-id :emoji "☺" :frequency 1}]
 
           (update-or-initialize-emoji-frequency! repeat-emoji-data)
 
           (is (= (query db
-                        ["SELECT emoji, user_id, message_id, frequency FROM emojis WHERE emoji = ?" (get emoji-data :emoji)]
+                        ["SELECT emoji, user_id, frequency FROM emojis WHERE emoji = ?" (get emoji-data :emoji)]
                         {:result-set-fn first})
-                 {:emoji "☺" :user_id user-id :message_id message-id :frequency 3})))))))
+                 {:emoji "☺" :user_id user-id :frequency 3})))))))
